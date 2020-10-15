@@ -72,7 +72,7 @@ public class SqlSessionFactoryBuilder {
     return build(inputStream, null, properties);
   }
 
-  public SqlSessionFactory build(InputStream inputStream, String environment, Properties properties) {
+  public SqlSessionFactory  build(InputStream inputStream, String environment, Properties properties) {
     try {
       //解析config.xml(mybatis解析xml是用的  java dom)     dom4j sax...
       XMLConfigBuilder parser = new XMLConfigBuilder(inputStream, environment, properties);

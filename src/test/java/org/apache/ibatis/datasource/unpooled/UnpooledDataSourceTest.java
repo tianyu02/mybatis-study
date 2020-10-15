@@ -1,4 +1,6 @@
-/**
+
+import java.sql.*;
+import	java.util.Properties;/**
  *    Copyright 2009-2019 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,18 +15,19 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.apache.ibatis.datasource.unpooled;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.util.Enumeration;
 
+import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSource;
+import org.apache.ibatis.datasource.unpooled.UnpooledDataSourceFactory;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import javax.sql.DataSource;
 
 class UnpooledDataSourceTest {
 
@@ -64,6 +67,72 @@ class UnpooledDataSourceTest {
       count++;
     }
     return count;
+  }
+
+  @Test
+  void unPooledDataSourceTest() {
+    UnpooledDataSourceFactory factory = new UnpooledDataSourceFactory();
+    Properties properties = new Properties();
+    properties.put("driver", "com.mysql.jdbc.Driver");
+    properties.put("url", "jdbc:mysql://192.168.2.27:3307/product");
+    properties.put("username", "product_rw");
+    properties.put("password", "GOhSyRsrz09ZH4QU");
+    factory.setProperties(properties);
+    DataSource dataSource = factory.getDataSource();
+    Connection connection = null;
+    try {
+      connection = dataSource.getConnection();
+      PreparedStatement preparedStatement = connection.prepareStatement("select * from p_sku order by id desc limit 1");
+      ResultSet resultSet = preparedStatement.executeQuery();
+      while (resultSet.next()) {
+        System.out.println(resultSet.getString(1));
+        System.out.println(resultSet.getString(4));
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    } finally {
+      try {
+        connection.close();
+      } catch (Exception e) {
+
+      }
+    }
+  }
+
+  @Test
+  void pooledDataSourceTest() {
+    PooledDataSourceFactory factory = new PooledDataSourceFactory();
+    Properties properties = new Properties();
+    properties.put("driver", "com.mysql.jdbc.Driver");
+    properties.put("url", "jdbc:mysql://192.168.2.27:3307/product");
+    properties.put("username", "product_rw");
+    properties.put("password", "GOhSyRsrz09ZH4QU");
+    factory.setProperties(properties);
+    factory.setProperties(properties);
+    DataSource dataSource = factory.getDataSource();
+    Connection conn = null;
+    try {
+      conn = dataSource.getConnection();
+//      PreparedStatement preparedStatement = conn.prepareStatement("select * from p_sku order by id desc limit 1");
+//      ResultSet resultSet = preparedStatement.executeQuery();
+//      while (resultSet.next()) {
+//        System.out.println(resultSet.getString(1));
+//        System.out.println(resultSet.getString(4));
+//      }
+//      conn.close();
+//      conn = dataSource.getConnection();
+      for (int i = 0; i < 10; i++) {
+        dataSource.getConnection();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        conn.close();
+      } catch (Exception e) {
+
+      }
+    }
   }
 
 }
