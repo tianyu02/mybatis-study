@@ -47,7 +47,13 @@ public class XPathParser {
 
   private final Document document;
   private boolean validation;
+  /**
+   * XML 实体解析器
+   */
   private EntityResolver entityResolver;
+  /**
+   * 变量 Properties 对象
+   */
   private Properties variables;
   private XPath xpath;
 
